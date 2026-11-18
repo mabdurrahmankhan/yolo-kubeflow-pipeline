@@ -1,0 +1,52 @@
+# =============================================================================
+# inference-service.yaml
+# KServe InferenceService for YOLOv8n ONNX via Triton Inference Server
+#
+# Apply with:
+#   kubectl apply -n yolo-project -f kserve/inference-service.yaml
+#
+# Check status:
+#   kubectl -n yolo-project get inferenceservice yolov8n
+#   kubectl -n yolo-project describe inferenceservice yolov8n
+# =============================================================================
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: yolov8n
+  namespace: yolo-project
+  labels:
+    app: yolov8n
+  annotations:
+    # Disable Istio sidecar injection on the predictor pod for minikube simplicity
+    sidecar.istio.io/inject: "false"
+spec:
+  predictor:
+    # KServe automatically selects kserve-tritonserver as the runtime for ONNX
+    model:
+      modelFormat:
+        name: onnx
+      # For Triton, storageUri must point to the model REPOSITORY root
+      # Triton expects: <root>/<model_name>/1/model.onnx + config.pbtxt
+      storageUri: "pvc://yolo-models"
+      runtime: kserve-tritonserver
+      protocolVersion: v2
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "2"
+          memory: "3Gi"
+      # Triton args: load only the yolov8n model, strict mode off
+      args:
+        - "--model-repository=/mnt/models"
+        - "--model-control-mode=explicit"
+        - "--load-model=yolov8n"
+        - "--strict-model-config=false"
+        - "--log-verbose=1"
+---
+# =============================================================================
+# ServiceAccount for KServe predictor (needs PVC access)
+# Applied automatically by KServe, included here for reference
+# =============================================================================
+# No extra RBAC needed for PVC storage — KServe mounts it automatically.

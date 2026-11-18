@@ -1,0 +1,15 @@
+# Generated pipeline output
+pipeline/*.yaml
+
+# Binaries and build artifacts
+*.tar
+minio
+__pycache__/
+*.pyc
+.venv/
+kfp-smoke*/
+
+# Secrets and local config
+*.env
+.kube/
+.minikube/

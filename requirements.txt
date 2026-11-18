@@ -1,0 +1,9 @@
+kfp==2.18.0
+kfp-kubernetes==2.18.0
+ultralytics==8.3.0
+onnx>=1.16.0
+onnxruntime>=1.19.0
+numpy>=1.26.4
+Pillow>=10.3.0
+requests>=2.31.0
+PyYAML>=6.0.1
